@@ -1,0 +1,12 @@
+[22-Jun-2025 03:27:08 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/acjpvcom/public_html/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/acjpvcom/public_html/config/app.php on line 18
+[22-Jun-2025 07:26:35 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/acjpvcom/public_html/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/acjpvcom/public_html/config/app.php on line 18
+[23-Jun-2025 14:42:46 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/acjpvcom/public_html/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/acjpvcom/public_html/config/app.php on line 18

@@ -1,0 +1,2256 @@
+@extends( Auth::user()->role->name === 'admin' ? 'layouts.user' :
+(Auth::user()->role->name === 'staff' ? 'layouts.staff' :
+(Auth::user()->role->name === 'superadmin' ? 'layouts.admin' : 'layouts.staff'))
+)
+@section('content')
+<style>
+  :root {
+    --primary-color: #1d344d;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-bg: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-color: #495057;
+  }
+
+  .container{
+    max-width: 1300px !important;
+    width: 100%;
+  }
+  .pos-container {
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .pos-card {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-control {
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .form-control-sm {
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  .btn {
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  .btn-xs {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+  }
+
+  .btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: #212529;
+  }
+
+  .btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+  }
+
+  .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+  }
+
+  .product-table {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .table thead th {
+    background-color: var(--light-bg);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 700;
+    padding: 12px 12px;
+    font-size: 14px;
+    color: var(--primary-color);
+    text-align: center;
+  }
+
+  .table tbody td {
+    padding: 16px 12px;
+    vertical-align: middle;
+    font-size: 16px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+
+  .table tfoot th {
+    background-color: var(--light-bg);
+    font-weight: 700;
+    padding: 18px 12px;
+    font-size: 14px;
+  }
+
+  /* Enhanced styling for important fields */
+  .product-name {
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--primary-color);
+    line-height: 1.4;
+  }
+
+.weight-input {
+  font-size: 18px;
+  font-weight: 700;
+  background-color: #fff3cd;
+  border: 2px solid var(--warning-color);
+  text-align: center;
+  padding: 12px 16px;
+  width: 120px;
+}
+
+.weight-input:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(29, 52, 77, 0.25);
+}
+
+.weight-input[readonly] {
+  text-align: end;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #495057;
+  cursor: not-allowed;
+  width: 160px;
+}
+
+.weight-input[readonly]:focus {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  box-shadow: none;
+}
+
+  .gold-rate-display {
+    font-size: 16px;
+    font-weight: 700;
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 8px 8px;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .sub-total {
+    width: 160px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--success-color);
+    text-align: right;
+    padding: 8px 12px;
+    background-color: #f8fff9;
+    border-radius: 4px;
+    border: 1px solid #d4edda;
+  }
+
+  .weight-remaining {
+    width: 50px;
+    font-size: 10px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .weight-remaining span{
+    font-size: 13px !important;
+    color: #0084f8;
+  }
+
+.customer-info {
+  background: var(--light-bg);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.customer-info h6 {
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 8px;
+}
+
+/* Customer Advance Balance Display */
+#customerAdvanceBalance {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--success-color);
+  background-color: #f7f7f7;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #d4edda;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Advance Buttons */
+.customer-info .btn-group .btn {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.customer-info .btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+.customer-info .btn-success {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+.used-advance-section {
+  background-color: #f8fff9;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #d4edda;
+  margin-top: 15px;
+}
+
+.used-advance-section strong {
+  color: var(--success-color);
+  font-size: 16px;
+}
+
+#used_advance_display {
+  background-color: var(--success-color);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+  .total-section {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 100%;
+    width: 100%;
+    background: var(--light-bg);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .total-section .row {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .total-section .row:last-child {
+    margin-bottom: 0;
+  }
+
+  .total-section strong {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+  }
+
+  .action-buttons .btn {
+    flex: 1;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .modal-header {
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-content {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-body .form-group .form-label {
+  font-weight: 700;
+  color: var(--text-color);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.modal-body .form-control {
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.modal-body .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(29, 52, 77, 0.25);
+}
+
+.modal-footer .btn {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 4px;
+}
+
+  .form-label {
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-size: 16px;
+  }
+
+  .badge {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 4px;
+  }
+
+  .badge-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .badge-primary {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .badge-success {
+    background-color: var(--success-color);
+    color: white;
+  }
+
+  .badge-warning {
+    background-color: var(--warning-color);
+    color: #212529;
+  }
+
+  /* Enhanced input styling for numeric values */
+  .form-control[type="number"] {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: right;
+    padding: 12px 16px;
+  }
+
+  .wastage-input, .stone-input {
+     width: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
+
+  .making-charges-input {
+    width: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: right;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
+
+  .discount-input {
+    width: 120px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: right;
+    background-color: #fff;
+    border: 2px solid #17a2b8;
+  }
+
+  .discount-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(29, 52, 77, 0.25);
+  }
+
+  .qty-input {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    background-color: #e7f3ff;
+    border: 2px solid #007bff;
+  }
+
+  /* Row numbering enhancement */
+  .table tbody td:nth-child(2) strong {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary-color);
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+  }
+
+  /* Cash payment input styling */
+#advance {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+  background-color: #f8fff9;
+  border: 2px solid var(--success-color);
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+
+#advance:focus {
+  background-color: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(29, 52, 77, 0.25);
+  outline: none;
+}
+
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+    }
+
+    .pos-container {
+      padding: 15px;
+    }
+
+    .table thead th {
+      font-size: 14px;
+      padding: 12px 8px;
+    }
+
+    .table tbody td {
+      font-size: 14px;
+      padding: 12px 8px;
+    }
+
+    .product-name {
+      font-size: 16px;
+    }
+
+    .weight-input {
+      font-size: 16px;
+    }
+
+    .sub-total {
+      font-size: 16px;
+    }
+
+    .badge {
+      font-size: 14px;
+      padding: 8px 12px;
+    }
+
+    .btn {
+      font-size: 14px;
+      padding: 10px 16px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .table thead th {
+      font-size: 12px;
+      padding: 10px 6px;
+    }
+
+    .table tbody td {
+      font-size: 12px;
+      padding: 10px 6px;
+    }
+
+    .product-name {
+      font-size: 14px;
+    }
+
+    .weight-input {
+      font-size: 14px;
+    }
+
+    .sub-total {
+      font-size: 14px;
+    }
+
+    .form-control {
+      font-size: 14px;
+    }
+
+    .form-control-sm {
+      font-size: 13px;
+    }
+  }
+
+  .reservation-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .reservation-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .reservation-status {
+    font-weight: 700;
+    text-transform: capitalize;
+    font-size: 16px;
+  }
+
+  .reservation-status.pending {
+    color: #ffc107;
+  }
+
+  .reservation-status.partial {
+    color: #17a2b8;
+  }
+
+  .reservation-status.paid {
+    color: #28a745;
+  }
+
+  .reservation-status.cancelled {
+    color: #dc3545;
+  }
+
+  .reservation-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .reservation-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .reservation-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  .reservation-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Alert styling for weight-based products */
+  .weight-alert {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  /* Enhanced button styling for remove advance */
+ #removeAdvanceBtn {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+  #removeAdvanceBtn:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  transform: scale(1.1);
+}
+  /* Table hover effects */
+  .table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+  }
+
+  /* Delete row button enhancement */
+  .delete_row {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .delete_row:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+  }
+
+  @media (max-width: 768px) {
+  .customer-info {
+    padding: 15px;
+    font-size: 14px;
+  }
+  
+  .customer-info h6 {
+    font-size: 16px;
+  }
+  
+  #customerAdvanceBalance {
+    font-size: 16px;
+    padding: 6px 10px;
+  }
+  
+  .customer-info .btn-group .btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  
+  #advance {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+  
+  #used_advance_display {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .customer-info {
+    padding: 12px;
+    font-size: 13px;
+  }
+  
+  .customer-info h6 {
+    font-size: 15px;
+  }
+  
+  #customerAdvanceBalance {
+    font-size: 14px;
+    padding: 5px 8px;
+  }
+  
+  .customer-info .btn-group .btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  
+  #advance {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+</style>
+<section class="content">
+<div class="container">
+<div class="pos-container">
+  <div class="pos-card">
+    <form
+      action="{{ route('pos_orders.store') }}"
+      method="POST"
+      id="posOrderForm"
+    >
+      @csrf
+
+      <!-- Customer & Product Selection -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="product_no" class="form-label">Product Code / Scan</label>
+          <input type="text" class="form-control" id="product_no" name="product_no" placeholder="Enter Product No / Scan Barcode"
+          />
+        </div>
+        <div class="col-md-6">
+          <label for="customer" class="form-label">Customer</label>
+          <div class="customer_select_div">
+              <select
+                  name="customer_id"
+                  class="form-control"
+                  id="customer"
+                  required
+              >
+                  @foreach ($customers as $customer)
+                      <option value="{{ $customer->id }}" {{ $customer->id == 1 ? 'selected' : '' }}>
+                          {{ $customer->name }}
+                      </option>
+                  @endforeach
+              </select>
+          </div>
+
+          <input
+            type="text"
+            class="form-control mt-2"
+            id="manual_customer"
+            name="manual_customer"
+            placeholder="Enter New Customer Name"
+            style="display: none"
+          />
+        </div>
+      </div>
+
+      <!-- Customer Advance & Reserve Section -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="customer-info">
+            <h6 class="mb-2">Customer Advance</h6>
+            <div class="mb-2">
+              <strong
+                >Balance:
+                <span id="customerAdvanceBalance" style="margin-left: 5px;">Rs 0.00</span></strong
+              >
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-info" id="useAdvanceBtn">
+                Use Advance
+              </button>
+              <button
+                type="button"
+                class="btn btn-success ml-1"
+                data-toggle="modal"
+                data-target="#addAdvanceModal"
+              >
+                Add Advance
+              </button>
+            </div>
+          </div>
+        </div>
+       <!-- Updated Product Reservation Section -->
+        <div class="col-md-6">
+        <div class="customer-info">
+            <h6 class="mb-2">Product Reservation</h6>
+            <p class="mb-2 text-muted small">
+            Reserve selected products for customer
+            </p>
+            
+            <!-- Pending Reservations Info -->
+            <div class="reservation-info mb-3" id="reservationInfo" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="font-weight-bold text-primary">Pending Reservations:</span>
+                <span class="badge badge-info" id="pendingReservationsCount">0</span>
+            </div>
+            
+            <!-- Reservations List -->
+            <div id="reservationsList" class="reservation-list" style="max-height: 200px; overflow-y: auto;">
+                <!-- Reservations will be populated here -->
+            </div>
+            
+            <!-- View All Link -->
+            <div class="text-center mt-2">
+                <a href="{{route('reservation.index')}}" class="btn btn-sm btn-outline-primary" id="viewAllReservations">
+                View All Reservations
+                </a>
+            </div>
+            </div>
+
+            <!-- Reserve Button -->
+            <button
+            type="button"
+            class="btn btn-warning btn-sm"
+            data-toggle="modal"
+            data-target="#reserveProductModal"
+            >
+            Reserve Selected
+            </button>
+        </div>
+        </div>
+      </div>
+
+      <!-- Hidden Tax Rate Section -->
+      <div class="form-group row col-3" style="display: none">
+        <label for="tax_rate" class="col-12" style="font-size: 0.8rem"
+          >Tax Rate</label
+        >
+        <input
+          type="text"
+          readonly
+          class="form-control form-control-sm col-10"
+          id="tax_rate_x"
+          name="tax_rate_x"
+          value="{{ $taxRate->rate }}%"
+          placeholder="8.14%"
+        />
+        <input
+          type="hidden"
+          readonly
+          class="form-control form-control-sm col-8"
+          id="tax_rate"
+          name="tax_rate"
+          value=""
+          placeholder="8.14%"
+        />
+        <input
+          type="hidden"
+          readonly
+          class="form-control form-control-sm col-8"
+          id="tax_rate_v"
+          name="tax_rate_v"
+          value="{{ $taxRate->rate }}"
+          placeholder="8.14%"
+        />
+      </div>
+
+      <!-- Products Table -->
+      <div class="product-table">
+        <table id="products" class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th width="80">Action</th>
+              <th>No</th>
+              <th>Product Name</th>
+              <th>Net Weight</th>
+              <th>Wastage Weight</th>
+              <th>Stone Weight</th>
+              <th>Gold Rate</th>
+              <th style="display: none">Qty</th>
+              <th>Making Charges</th>
+              <th>Discout</th>
+              <th>Sub Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Product rows will be added here dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+     <!-- Total Section aligned to right -->
+<div class="total-section d-flex justify-content-end">
+  <div class="w-100" style="max-width: 400px">
+    {{-- <div class="row">
+      <div class="col-6">
+        <strong>Sub Total:</strong>
+      </div>
+      <div class="col-6 text-right">
+        <span class="badge badge-secondary" id="sub_total_amount">Rs 0.00</span>
+        <input type="hidden" id="main_sub_total" name="main_sub_total" value="0.00">
+      </div>
+    </div> --}}
+    
+    <!-- Discount Section -->
+    <input type="hidden" name="total_discount" id="total_discount" value="0.00">
+
+    
+    <div class="row mt-2">
+      <div class="col-6">
+        <strong>Total Amount:</strong>
+      </div>
+      <div class="col-6 text-right">
+        <span class="badge badge-primary" id="total_amount" style="font-size: 15px;">Rs 0.00</span>
+      </div>
+    </div>
+    
+    <div class="row mt-2" style="display: none">
+      <div class="col-6">Inclusive Tax:</div>
+      <div class="col-6 text-right" id="inclusive_tax">0.00</div>
+    </div>
+    
+    <!-- Used Advance Section -->
+    <div class="row mt-2 used-advance-section" id="usedAdvanceSection" style="display: none;">
+      <div class="col-6">
+        <strong>Used Advance:</strong>
+      </div>
+      <div class="col-6 text-right">
+        <button type="button" class="btn btn-xs btn-link text-danger p-0 mr-2" id="removeAdvanceBtn" title="Remove Advance" style="font-size: 15px;">
+          <i class="fas fa-times"></i>
+        </button>
+        <span class="badge badge-success" id="used_advance_display" style="font-size: 15px;">Rs 0.00</span>
+        
+      </div>
+    </div>
+    
+    <div class="row mt-2">
+      <div class="col-6">
+        <strong>Cash Payment:</strong>
+      </div>
+      <div class="col-6" >
+        <input type="hidden" id="total" name="total" value="0.00" />
+        <input type="number" id="advance" name="advance" value="0.00" 
+               class="form-control form-control-sm text-right" placeholder="0.00" step="0.01" style="font-size: 15px;"/>
+        <input type="hidden" id="balance" name="balance" value="0.00" />
+      </div>
+    </div>
+    
+    <div class="row mt-2">
+      <div class="col-6">
+        <strong>Balance Due:</strong>
+      </div>
+      <div class="col-6 text-right">
+        <span class="badge badge-warning" id="balance_amount" style="font-size: 15px;">Rs 0.00</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <input type="hidden" name="advance_used" id="advanceUsed" />
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button type="button" id="cancelButton" class="btn btn-danger">
+          Clear
+        </button>
+        <button type="submit" name="save" class="btn btn-success">
+          Save Order
+        </button>
+        <button type="submit" name="print" class="btn btn-primary">
+          Print Order
+        </button>
+        <button type="button" id="addManualRow" class="btn btn-info">
+          Add Manual Row
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+    </div>
+</section>
+<!-- Add Advance Modal -->
+<div class="modal fade" id="addAdvanceModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Customer Advance</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="addAdvanceForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Amount</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Rs </span>
+              </div>
+              <input
+                type="number"
+                class="form-control"
+                name="amount"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              name="notes"
+              rows="3"
+              placeholder="Optional notes about this advance payment..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" class="btn btn-primary">Save Advance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Reserve Product Modal -->
+<div class="modal fade" id="reserveProductModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reserve Product</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="reserveProductForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Total Amount</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Rs </span>
+              </div>
+              <input
+                type="number"
+                class="form-control"
+                id="reserveTotalAmount"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Initial Payment</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Rs </span>
+              </div>
+              <input
+                type="number"
+                class="form-control"
+                name="initial_payment"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivery Date</label>
+            <input type="date" class="form-control" name="delivery_date" />
+          </div>
+        </div>
+        <input type="hidden" />
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Create Reservation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+  rel="stylesheet"
+/>
+
+<!-- Include Select2 CSS -->
+<link
+  href="{{ asset('plugins/select2/css/select2.min.css') }}"
+  rel="stylesheet"
+/>
+<!-- Include Select2 Bootstrap 4 Theme CSS -->
+<link
+  href="{{
+    asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')
+  }}"
+  rel="stylesheet"
+/>
+
+<!-- Include Select2 JS -->
+<script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+
+<script>
+  $(document).ready(function() {
+      // Auto-focus on product search field when page loads
+    $('#product_no').focus();
+      // Gold rates data for JavaScript
+      const goldRatesData = @json($goldRates);
+
+          $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
+
+      $('#customer').select2({
+          theme: 'bootstrap4',
+          allowClear: true
+      });
+
+      $('#product_no').on('keydown', function(event) {
+          if (event.key === 'Enter') {
+              event.preventDefault();
+              $(this).trigger('change');
+          }
+      });
+
+      let rowNo = 0;
+
+      // ============== UPDATED PRODUCT FUNCTIONS ==============
+
+      $('#product_no').on('change', function(e) {
+          e.preventDefault();
+          const productNo = $(this).val();
+          if (!productNo) return;
+
+          $.ajax({
+              url: "{{ route('product.details', '') }}/" + productNo,
+              method: 'GET',
+              success: function(response) {
+                  if (response.success) {
+                      addProductRow(response.data);
+                      $('#product_no').val('');
+                  } else {
+                      toastr.error(response.message);
+                  }
+              },
+              error: function() {
+                  toastr.error('Error fetching product details.');
+              }
+          });
+      });
+
+      function addProductRow(productDetails) {
+    rowNo = $('#products tbody tr').length + 1;
+
+    // Check if product quantity is 0 (sold out)
+    if (productDetails.qty == 0) {
+        toastr.error('Selected item was sold out');
+        return;
+    }
+
+    // Check if product already exists
+    const existingRow = $('#products tbody tr').filter(function() {
+        return $(this).find('input[name*="[product_id]"]').val() == productDetails.id;
+    });
+
+    if (existingRow.length > 0) {
+        toastr.warning('This product is already added.');
+        return;
+    }
+
+    // Find the gold rate for this product
+    let goldRate = 0;
+    let goldRateId = '';
+    let goldRateName = 'No Rate';
+
+    if (productDetails.gold_rate_id && productDetails.gold_rate) {
+        goldRate = parseFloat(productDetails.gold_rate.rate);
+        goldRateId = productDetails.gold_rate_id;
+        goldRateName = productDetails.gold_rate.name;
+    }
+
+    const productType = productDetails.product_type ? productDetails.product_type.toLowerCase() : 'gold';
+    const type = productDetails.type;
+
+    // Ensure all values are proper numbers
+    const qty = 1;
+    const makingCharges = parseFloat(productDetails.making_charges || 0) || 0;
+    const wastageWeight = parseFloat(productDetails.wastage_weight || 0) || 0;
+    const stoneWeight = parseFloat(productDetails.stone_weight || 0) || 0;
+    const netWeight = parseFloat(productDetails.weight || 0) || 0;
+    const discount = 0;
+
+    // For weight-based products (type == 1)
+    let subTotal = 0;
+    let weightInputHtml = '';
+    
+    if (type == 1) {
+      // Weight-based product - user needs to enter weight
+      weightInputHtml = `
+          <div class="d-flex align-items-center gap-1">
+              <p class="weight-remaining">Available: <span>${netWeight.toFixed(3)}g</span></p>
+              <input type="number" 
+                    name="products[${rowNo}][weight]" 
+                    class="form-control weight-input" 
+                    value="" 
+                    step="0.001" 
+                    min="0" 
+                    max="${netWeight}" 
+                    placeholder="Enter weight" 
+                    required
+                    onfocus="this.select()"
+                    onkeydown="return event.keyCode !== 13"> <!-- Prevent enter key -->
+          </div>
+      `;
+  } else {
+      // Fixed weight product - calculate subtotal immediately
+      const totalWeight = netWeight + wastageWeight - stoneWeight;
+      subTotal = parseFloat((qty * goldRate * totalWeight) + makingCharges - discount) || 0;
+      subTotal = Math.max(0, subTotal);
+      
+      weightInputHtml = `
+          <input type="number" 
+                name="products[${rowNo}][weight]" 
+                class="form-control weight-input" 
+                value="${netWeight.toFixed(3)}" 
+                step="0.001" 
+                min="0" 
+                readonly>
+      `;
+  }
+
+    const newRow = `
+        <tr data-product-type="${type}">
+            <td class="p-1 pl-2">
+                <a class="btn btn-xs btn-danger delete_row"><i class="fas fa-times"></i></a>
+                <input type="hidden" name="products[${rowNo}][product_id]" value="${productDetails.id}">
+                <input type="hidden" name="products[${rowNo}][sub_total]" value="${subTotal.toFixed(2)}">
+                <input type="hidden" name="products[${rowNo}][name]" value="${productDetails.name}">
+                <input type="hidden" name="products[${rowNo}][max_qty]" value="${productDetails.qty}">
+                <input type="hidden" name="products[${rowNo}][original_weight]" value="${netWeight.toFixed(3)}">
+                <input type="hidden" name="products[${rowNo}][qty]" value="${qty}">
+                <input type="hidden" name="products[${rowNo}][making_charges]" value="${makingCharges.toFixed(2)}">
+                <input type="hidden" name="products[${rowNo}][wastage_weight]" value="${wastageWeight.toFixed(3)}">
+                <input type="hidden" name="products[${rowNo}][stone_weight]" value="${stoneWeight.toFixed(3)}">
+                <input type="hidden" name="products[${rowNo}][gold_rate]" value="${goldRate.toFixed(2)}">
+                <input type="hidden" name="products[${rowNo}][gold_rate_id]" value="${goldRateId}">
+                <input type="hidden" name="products[${rowNo}][product_type]" value="${productType}">
+                <input type="hidden" name="products[${rowNo}][type]" value="${type}">
+                <input type="hidden" name="products[${rowNo}][discount]" value="0">
+            </td>
+            <td class="p-1 pl-2"><strong>${rowNo}</strong></td>
+            <td class="p-1 pl-2">
+                <div class="product-name">${productDetails.name}</div>
+            </td>
+            <td class="p-1 pl-2">
+                ${weightInputHtml}
+            </td>
+            <td class="p-1 pl-2">
+                <input type="number" class="form-control form-control-sm wastage-input" value="${wastageWeight.toFixed(3)}" step="0.001" min="0" readonly>
+            </td>
+            <td class="p-1 pl-2">
+                <input type="number" class="form-control form-control-sm stone-input" value="${stoneWeight.toFixed(3)}" step="0.001" min="0" readonly>
+            </td>
+            <td class="p-1 pl-2">
+                <div class="gold-rate-display">${goldRateName}</div>
+            </td>
+            <td class="p-1 pl-2" style="display: none;">
+                <input type="number" class="form-control form-control-sm qty-input" value="${qty}" min="1" max="${productDetails.qty}">
+            </td>
+            <td class="p-1 pl-2">
+                <input type="number" class="form-control form-control-sm making-charges-input" value="${makingCharges.toFixed(2)}" step="0.01" min="0" readonly>
+            </td>
+            <td class="p-1 pl-2">
+                <input type="number" class="form-control form-control-sm discount-input" value="0" step="0.01" min="0">
+            </td>
+            <td class="p-1 pl-2">
+                <div class="sub-total">${type == 1 ? 'Rs 0.00' : 'Rs ' + subTotal.toFixed(2)}</div>
+            </td>
+        </tr>
+    `;
+
+    $('#products tbody').append(newRow);
+    
+    // Only calculate total if it's not a weight-based product
+    if (type != 1) {
+        calculateTotal();
+    }
+}
+
+
+
+      $('#addManualRow').on('click', function() {
+          rowNo = $('#products tbody tr').length + 1;
+
+          const newRow = `
+              <tr>
+                  <td class="p-1 pl-2">
+                      <a class="btn btn-xs btn-danger delete_row"><i class="fas fa-times"></i></a>
+                      <input type="hidden" name="products[${rowNo}][product_id]" value="0">
+                      <input type="hidden" name="products[${rowNo}][sub_total]" value="0">
+                      <input type="hidden" name="products[${rowNo}][wastage_weight]" value="0">
+                      <input type="hidden" name="products[${rowNo}][stone_weight]" value="0">
+                      <input type="hidden" name="products[${rowNo}][gold_rate]" value="0">
+                      <input type="hidden" name="products[${rowNo}][gold_rate_id]" value="">
+                      <input type="hidden" name="products[${rowNo}][qty]" value="1">
+                      <input type="hidden" name="products[${rowNo}][making_charges]" value="0">
+                      <input type="hidden" name="products[${rowNo}][weight]" value="0">
+                  </td>
+                  <td class="p-1 pl-2">${rowNo}</td>
+                  <td class="p-1 pl-2">
+                      <input type="text" name="products[${rowNo}][name]" class="form-control form-control-sm" placeholder="Product Name" required>
+                  </td>
+                  <td class="p-1 pl-2">
+                      <input type="number" name="products[${rowNo}][weight]" class="form-control form-control-sm weight-input" placeholder="Net Weight" step="0.001" min="0" required>
+                  </td>
+                  <td class="p-1 pl-2">
+                      <input type="number" class="form-control form-control-sm wastage-input" value="0" step="0.001" min="0">
+                  </td>
+                  <td class="p-1 pl-2">
+                      <input type="number" class="form-control form-control-sm stone-input" value="0" step="0.001" min="0">
+                  </td>
+                  <td class="p-1 pl-2">
+                      ${(() => {
+                          const defaultRate = goldRatesData.find(rate => rate.is_default) || goldRatesData[0];
+                          return `
+                              <span class="form-control form-control-sm bg-light">${defaultRate ? defaultRate.name : 'No Rate Available'}</span>
+                              <input type="hidden" name="products[${rowNo}][gold_rate]" value="${defaultRate ? defaultRate.rate : 0}">
+                              <input type="hidden" name="products[${rowNo}][gold_rate_id]" value="${defaultRate ? defaultRate.id : ''}">
+                          `;
+                      })()}
+                  </td>
+                  <td class="p-1 pl-2" style="display: none;">
+                      <input type="number" name="products[${rowNo}][qty]" class="form-control form-control-sm qty-input" value="1" min="1" required>
+                  </td>
+                  <td class="p-1 pl-2">
+                      <input type="number" name="products[${rowNo}][making_charges]" class="form-control form-control-sm making-charges-input" value="0" step="0.01" min="0">
+                  </td>
+                  <td class="p-1 pl-2">
+                      <input type="number" class="form-control form-control-sm discount-input" value="0" step="0.01" min="0">
+                  </td>
+                  
+                  <td class="p-1 pl-2 sub-total">0.00</td>
+              </tr>
+          `;
+
+          $('#products tbody').append(newRow);
+          calculateTotal();
+      });
+
+      $(document).on('input change', '.qty-input, .wastage-input, .stone-input, .gold-rate-input, .making-charges-input, .discount-input', function() {
+          const row = $(this).closest('tr');
+          updateRowCalculations(row);
+      });
+
+    // Updated Row Calculations Function
+    function updateRowCalculations(row) {
+        const weight = parseFloat(row.find('.weight-input').val()) || 0;
+        const wastageWeight = parseFloat(row.find('.wastage-input').val()) || 0;
+        const stoneWeight = parseFloat(row.find('.stone-input').val()) || 0;
+        const qty = parseFloat(row.find('.qty-input').val()) || 1;
+        const makingCharges = parseFloat(row.find('.making-charges-input').val()) || 0;
+        const discount = parseFloat(row.find('.discount-input').val()) || 0;
+        
+        // Get gold rate from hidden field
+        const goldRate = parseFloat(row.find('input[name*="[gold_rate]"]').val()) || 0;
+        const goldRateId = row.find('input[name*="[gold_rate_id]"]').val() || '';
+        
+        // Check if this is a weight-based product (type == 1)
+        const productType = parseInt(row.find('input[name*="[type]"]').val()) || 0;
+        const originalWeight = parseFloat(row.find('input[name*="[original_weight]"]').val()) || 0;
+        
+        // Validate weight for weight-based products
+        if (productType == 1 && weight > originalWeight) {
+            toastr.error(`Weight cannot exceed available weight (${originalWeight.toFixed(3)}g)`);
+            row.find('.weight-input').val(originalWeight.toFixed(3));
+            return;
+        }
+        
+        // Calculate total weight and subtotal
+        const totalWeight = weight + wastageWeight - stoneWeight;
+        let subTotal = 0;
+        
+        if (weight > 0) {
+            // Calculate subtotal before discount
+            const baseAmount = parseFloat((qty * goldRate * totalWeight) + makingCharges) || 0;
+            // Apply discount to get final subtotal
+            subTotal = Math.max(0, baseAmount - discount);
+        }
+
+        // Update all hidden fields
+        row.find('input[name*="[sub_total]"]').val(subTotal.toFixed(2));
+        row.find('input[name*="[wastage_weight]"]').val(wastageWeight.toFixed(3));
+        row.find('input[name*="[stone_weight]"]').val(stoneWeight.toFixed(3));
+        row.find('input[name*="[qty]"]').val(qty);
+        row.find('input[name*="[making_charges]"]').val(makingCharges.toFixed(2));
+        row.find('input[name*="[weight]"]').val(weight.toFixed(3));
+        row.find('input[name*="[discount]"]').val(discount.toFixed(2));
+
+        // Update display
+        row.find('.sub-total').text('Rs ' + subTotal.toFixed(2));
+        
+        // Update weight remaining display for weight-based products
+        if (productType == 1) {
+            const remaining = originalWeight - weight;
+            row.find('.weight-remaining').text(`Available: ${remaining.toFixed(3)}g`);
+        }
+        
+        calculateTotal();
+    }
+
+
+    // Update the event listener to use change instead of input for weight inputs
+    $(document).on('change', '.weight-input', function() {
+        const row = $(this).closest('tr');
+        updateRowCalculations(row);
+    });
+
+     $(document).on('click', '.delete_row', function() {
+        const row = $(this).closest('tr');
+        const customerId = $('#customer').val();
+        const currentAdvanceUsed = parseFloat($('#advanceUsed').val()) || 0;
+
+        // Store the subtotal of the row being deleted
+        const deletedRowSubtotal = parseFloat(row.find('input[name*="[sub_total]"]').val()) || 0;
+
+        // Remove the row
+        row.remove();
+
+        // Recalculate totals
+        calculateTotal();
+
+        // Check if there are no more products
+        const remainingProducts = $('#products tbody tr').length;
+        
+        if (remainingProducts === 0) {
+            // If no products remain, clear used advance
+            clearUsedAdvance();
+            // Also clear the cash payment field
+            $('#advance').val('0.00');
+            $('#advance').trigger('input');
+        } else if (currentAdvanceUsed > 0 && customerId && !$('#add_manual_customer').is(':checked')) {
+            // If advance was used and we still have products, recalculate advance balance
+            recalculateAdvanceBalance(customerId);
+        }
+    });
+   
+
+function calculateTotal() {
+    let subTotal = 0;
+    let totalDiscount = 0;
+
+    // Currency formatter
+    const formatCurrency = (value) => {
+        return 'Rs ' + new Intl.NumberFormat('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    };
+
+    // Calculate subtotal and total discount from all products
+    $('#products tbody tr').each(function() {
+        const subTotalText = $(this).find('.sub-total').text().replace('Rs ', '').replace(/,/g, '');
+        const productSubTotal = parseFloat(subTotalText) || 0;
+        const productDiscount = parseFloat($(this).find('.discount-input').val()) || 0;
+        
+        subTotal += productSubTotal;
+        totalDiscount += productDiscount;
+    });
+
+    // If .sub-total already includes discount, don't subtract again
+    const finalTotal = Math.max(0, subTotal);
+
+    // Update displays with formatted currency
+    $('#sub_total_amount').text(formatCurrency(subTotal));
+    $('#total_amount').text(formatCurrency(finalTotal));
+    $('#total').val(finalTotal.toFixed(2));
+    $('#total_discount').val(totalDiscount.toFixed(2));
+
+    // Calculate tax
+    const taxRate = parseFloat($('#tax_rate_v').val()) || 0;
+    const inclusiveTax = parseFloat((finalTotal * taxRate) / (100 + taxRate)) || 0;
+    $('#inclusive_tax').text(inclusiveTax.toFixed(2));
+    $('#tax_rate').val(inclusiveTax.toFixed(2));
+
+    // Get current advance used and cash payment
+    const advanceUsed = parseFloat($('#advanceUsed').val()) || 0;
+    const cashPayment = parseFloat($('#advance').val()) || 0;
+
+    // Calculate balance due
+    const balanceDue = Math.max(0, finalTotal - advanceUsed - cashPayment);
+    $('#balance_amount').text(formatCurrency(balanceDue));
+    $('#balance').val(balanceDue.toFixed(2));
+
+    // If total is 0, clear used advance
+    if (finalTotal === 0) {
+        clearUsedAdvance();
+        $('#advance').val('0.00');
+    }
+
+    // Update reserve modal total if it's open
+    if ($('#reserveProductModal').is(':visible')) {
+        $('#reserveTotalAmount').val(finalTotal.toFixed(2));
+    }
+}
+
+    // Update advance input handler to properly calculate balance
+    $('#advance').on('input', function() {
+        const total = parseFloat($('#total').val()) || 0;
+        const advanceUsed = parseFloat($('#advanceUsed').val()) || 0;
+        const cashPayment = parseFloat($(this).val()) || 0;
+        
+        // Calculate balance (total - advance used - cash payment)
+        const balance = Math.max(0, total - advanceUsed - cashPayment);
+        $('#balance_amount').text('Rs ' + balance.toFixed(2));
+        $('#balance').val(balance.toFixed(2));
+    });
+
+
+    // Add event listener for total discount
+    $('#total_discount').on('input', function() {
+        calculateTotal();
+    });
+
+
+      $('#add_manual_customer').change(function() {
+          if ($(this).is(':checked')) {
+              $('.customer_select_div').hide();
+              $('#manual_customer').show();
+              $('#customer').prop('required', false);
+              $('#manual_customer').prop('required', true);
+              // Disable advance functions for manual customer
+              $('#customerAdvanceBalance').text('Rs 0.00');
+              $('#useAdvanceBtn').prop('disabled', true);
+          } else {
+              $('.customer_select_div').show();
+              $('#manual_customer').hide();
+              $('#customer').prop('required', true);
+              $('#manual_customer').prop('required', false);
+              // Re-enable advance functions
+              $('#useAdvanceBtn').prop('disabled', false);
+              const customerId = $('#customer').val();
+              if (customerId) {
+                  loadCustomerAdvanceBalance(customerId);
+              }
+          }
+      });
+
+      // ============== NEW ADVANCE & RESERVATION FUNCTIONS ==============
+
+// Function to load customer reservations
+    function loadCustomerReservations(customerId) {
+        if (!customerId) {
+            $('#reservationInfo').hide();
+            return;
+        }
+
+        $.ajax({
+            url: `/customer/${customerId}/reservations`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    displayReservations(response.reservations);
+                } else {
+                    console.error('Failed to load reservations:', response.message);
+                    $('#reservationInfo').hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load customer reservations:', error);
+                $('#reservationInfo').hide();
+            }
+        });
+    }
+
+
+// Function to display reservations
+    function displayReservations(reservations) {
+        const pendingReservations = reservations.filter(r => r.status === 'pending' || r.status === 'partial');
+        const pendingCount = pendingReservations.length;
+        
+        // Update count badge
+        $('#pendingReservationsCount').text(pendingCount);
+        
+        if (pendingCount > 0) {
+            $('#reservationInfo').show();
+            
+            // Clear existing list
+            $('#reservationsList').empty();
+            
+            // Add each pending reservation
+            pendingReservations.forEach(function(reservation) {
+                const deliveryDate = new Date(reservation.delivery_date).toLocaleDateString();
+                const remainingAmount = reservation.total_amount - reservation.paid_amount;
+                
+                const reservationHtml = `
+                    <div class="reservation-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="font-weight-bold">ID: #${reservation.id}</div>
+                                <div class="text-muted small">
+                                    ${reservation.products_count} product(s) • 
+                                    Delivery: ${deliveryDate}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-weight-bold">Rs ${parseFloat(reservation.total_amount).toFixed(2)}</div>
+                                <div class="reservation-status ${reservation.status}">${reservation.status}</div>
+                            </div>
+                        </div>
+                        ${remainingAmount > 0 ? `
+                            <div class="mt-1 text-danger small">
+                                Remaining: Rs ${remainingAmount.toFixed(2)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                $('#reservationsList').append(reservationHtml);
+            });
+        } else {
+            $('#reservationInfo').hide();
+        }
+    }
+
+
+      // Load customer advance balance and reservation when customer is selected
+      $('#customer').on('change', function() {
+        const customerId = $(this).val();
+        if (customerId && !$('#add_manual_customer').is(':checked')) {
+            loadCustomerAdvanceBalance(customerId);
+            loadCustomerReservations(customerId); // Add this line
+        } else {
+            $('#customerAdvanceBalance').text('Rs 0.00');
+            $('#reservationInfo').hide(); // Add this line
+        }
+    });
+
+      // Load customer advance balance function
+    function loadCustomerAdvanceBalance(customerId) {
+        $.ajax({
+            url: `/customer/${customerId}/advance-balance`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#customerAdvanceBalance').text(`Rs${parseFloat(response.balance).toFixed(2)}`);
+                } else {
+                    $('#customerAdvanceBalance').text('Rs 0.00');
+                    console.error('Failed to load balance:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#customerAdvanceBalance').text('Rs 0.00');
+                console.error('Failed to load customer advance balance:', error);
+            }
+        });
+    }
+
+
+
+    // Function to clear used advance display
+    function clearUsedAdvance() {
+        $('#usedAdvanceSection').hide();
+        $('#used_advance_display').text('Rs 0.00');
+        $('#advanceUsed').val('0.00');
+    }
+
+
+  function recalculateAdvanceBalance(customerId) {
+      const currentOrderTotal = parseFloat($('#total').val()) || 0;
+      const currentAdvanceInOrder = parseFloat($('#advance').val()) || 0;
+      const advanceUsedFromCustomer = parseFloat($('#advanceUsed').val()) || 0;
+
+      // If the order total is less than the advance currently applied
+      if (currentOrderTotal < currentAdvanceInOrder) {
+          const excessAdvance = currentAdvanceInOrder - currentOrderTotal;
+
+          // Adjust the advance in the order
+          const newAdvanceInOrder = Math.max(0, currentOrderTotal);
+          $('#advance').val(newAdvanceInOrder.toFixed(2));
+
+          // Reduce the advance used from customer
+          const newAdvanceUsed = Math.max(0, advanceUsedFromCustomer - excessAdvance);
+          $('#advanceUsed').val(newAdvanceUsed.toFixed(2));
+
+          // Recalculate balance
+          $('#advance').trigger('input');
+
+          // Update customer advance balance display
+          loadCustomerAdvanceBalance(customerId);
+
+          if (excessAdvance > 0) {
+              toastr.info(`Rs ${excessAdvance.toFixed(2)} advance has been returned to customer balance`);
+          }
+      }
+  }
+
+     // Add Customer Advance Modal Form Submit
+    $('#addAdvanceForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const customerId = $('#customer').val();
+        if (!customerId || $('#add_manual_customer').is(':checked')) {
+            toastr.error('Please select a customer from the dropdown first');
+            return;
+        }
+
+        const formData = {
+            amount: parseFloat($('input[name="amount"]').val()),
+            notes: $('textarea[name="notes"]').val(),
+            _token: $('meta[name="csrf-token"]').attr('content')
+        };
+
+        // Disable submit button to prevent double submission
+        const submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.prop('disabled', true);
+
+        $.ajax({
+            url: `/customer/${customerId}/advance`,
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success(response.message || 'Advance added successfully');
+                    $('#customerAdvanceBalance').text(`Rs${parseFloat(response.new_balance).toFixed(2)}`);
+                    $('#addAdvanceModal').modal('hide');
+                    $('#addAdvanceForm')[0].reset();
+                    
+                    // Redirect to print receipt
+                    if (response.print_url) {
+                        window.open(response.print_url, '_blank');
+                        // Or use window.location.href = response.print_url; if you want to redirect in same tab
+                    }
+                } else {
+                    toastr.error(response.message || 'Failed to add advance');
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                if (response && response.errors) {
+                    Object.keys(response.errors).forEach(key => {
+                        toastr.error(response.errors[key][0]);
+                    });
+                } else {
+                    toastr.error(response?.message || 'Failed to add advance');
+                }
+            },
+            complete: function() {
+                submitBtn.prop('disabled', false);
+            }
+        });
+    });
+
+
+    // Updated Use Advance Button Click Handler
+    $('#useAdvanceBtn').on('click', function() {
+        const customerId = $('#customer').val();
+        const currentBalance = parseFloat($('#customerAdvanceBalance').text().replace('Rs', ''));
+        const orderTotal = parseFloat($('#total').val()) || 0;
+        const currentAdvance = parseFloat($('#advance').val()) || 0;
+
+        if (!customerId || $('#add_manual_customer').is(':checked')) {
+            toastr.error('Please select a customer from the dropdown first');
+            return;
+        }
+
+        if (currentBalance <= 0) {
+            toastr.error('Customer has no advance balance');
+            return;
+        }
+
+        if (orderTotal <= 0) {
+            toastr.error('Please add products to the order first');
+            return;
+        }
+
+        // Calculate maximum usable advance
+        const remainingBalance = orderTotal - currentAdvance;
+        const maxUsableAdvance = Math.min(currentBalance, remainingBalance);
+
+        if (maxUsableAdvance <= 0) {
+            toastr.info('No more advance can be used for this order');
+            return;
+        }
+
+        // Create modal for amount input
+        const modalHtml = `
+            <div class="modal fade" id="useAdvanceModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Use Customer Advance</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Available advance: Rs ${currentBalance.toFixed(2)}</p>
+                            <p>Maximum usable for this order: Rs ${maxUsableAdvance.toFixed(2)}</p>
+                            <div class="form-group">
+                                <label for="advanceAmount">Amount to use:</label>
+                                <input type="number" class="form-control" id="advanceAmount"
+                                      max="${maxUsableAdvance}" min="0.01" step="0.01"
+                                      value="${maxUsableAdvance.toFixed(2)}">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="confirmUseAdvance">Use Advance</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        $('#useAdvanceModal').remove();
+
+        // Add modal to body and show it
+        $('body').append(modalHtml);
+        $('#useAdvanceModal').modal('show');
+
+        // Handle confirm button click
+    // Updated Use Advance confirmation handler
+    $('#confirmUseAdvance').on('click', function() {
+        const useAmount = parseFloat($('#advanceAmount').val());
+
+        if (isNaN(useAmount) || useAmount <= 0) {
+            toastr.error('Please enter a valid amount');
+            return;
+        }
+
+        if (useAmount > maxUsableAdvance) {
+            toastr.error(`Cannot use more than Rs ${maxUsableAdvance.toFixed(2)}`);
+            return;
+        }
+
+        // Store the used advance amount (DON'T modify cash payment field)
+        $('#advanceUsed').val(useAmount.toFixed(2));
+
+        // Show and update the used advance display
+        $('#usedAdvanceSection').show();
+        $('#used_advance_display').text(`Rs ${useAmount.toFixed(2)}`);
+
+        // Update customer advance balance display
+        const newCustomerBalance = currentBalance - useAmount;
+        $('#customerAdvanceBalance').text(`Rs ${newCustomerBalance.toFixed(2)}`);
+
+        // Recalculate balance (this will consider both advance and any existing cash payment)
+        calculateTotal();
+
+        $('#useAdvanceModal').modal('hide');
+        toastr.success(`Rs ${useAmount.toFixed(2)} advance applied to order`);
+    });
+    });
+
+    // Handle remove advance button click
+// Handle remove advance button click
+$(document).on('click', '#removeAdvanceBtn', function() {
+    const customerId = $('#customer').val();
+    const advanceUsed = parseFloat($('#advanceUsed').val()) || 0;
+    const currentCashPayment = parseFloat($('#advance').val()) || 0;
+    const totalAmount = parseFloat($('#total').val()) || 0;
+    
+    // Calculate how much of the advance was covering the total
+    const advanceCoverage = Math.min(advanceUsed, totalAmount);
+    
+    // Remove the used advance from the order
+    $('#advanceUsed').val('0.00');
+    
+    // If there was cash payment, adjust it to maintain the same balance
+    if (currentCashPayment > 0) {
+        // The new cash payment should cover what the advance was covering
+        $('#advance').val((currentCashPayment + advanceCoverage).toFixed(2));
+    }
+    
+    // Trigger input event to recalculate balance
+    $('#advance').trigger('input');
+    
+    // Hide the used advance section
+    $('#usedAdvanceSection').hide();
+    
+    // Update customer advance balance display if we have a customer
+    if (customerId && !$('#add_manual_customer').is(':checked')) {
+        loadCustomerAdvanceBalance(customerId);
+    }
+    
+    toastr.success('Advance removed from order');
+});
+
+
+  // Initialize delivery date to today + 7 days when modal opens
+  $(document).on('shown.bs.modal', '#reserveProductModal', function() {
+      // Set default delivery date to 7 days from today
+      const today = new Date();
+      const defaultDeliveryDate = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
+      const formattedDate = defaultDeliveryDate.toISOString().split('T')[0];
+      $('input[name="delivery_date"]').val(formattedDate);
+  });
+
+
+  // Add real-time validation for initial payment
+  $(document).on('input', 'input[name="initial_payment"]', function() {
+      const totalAmount = parseFloat($('#reserveTotalAmount').val()) || 0;
+      const initialPayment = parseFloat($(this).val()) || 0;
+
+      if (initialPayment > totalAmount) {
+          $(this).addClass('is-invalid');
+          if (!$(this).next('.invalid-feedback').length) {
+              $(this).after('<div class="invalid-feedback">Initial payment cannot exceed total amount</div>');
+          }
+      } else {
+          $(this).removeClass('is-invalid');
+          $(this).next('.invalid-feedback').remove();
+      }
+  });
+
+
+
+  // Auto-populate customer advance balance on page load if customer is pre-selected
+   const initialCustomerId = $('#customer').val();
+    if (initialCustomerId && !$('#add_manual_customer').is(':checked')) {
+        loadCustomerAdvanceBalance(initialCustomerId);
+        loadCustomerReservations(initialCustomerId);
+    }
+
+  // Handle Select2 events for customer advance
+  $('#customer').on('select2:select', function(e) {
+        const customerId = e.params.data.id;
+        if (customerId && !$('#add_manual_customer').is(':checked')) {
+            loadCustomerAdvanceBalance(customerId);
+            loadCustomerReservations(customerId);
+        }
+    });
+
+      // Clear advance balance when customer is cleared
+  $('#customer').on('select2:clear', function(e) {
+      $('#customerAdvanceBalance').text('Rs 0.00');
+  });
+  });
+
+
+  $('#customer').on('select2:clear', function(e) {
+        $('#customerAdvanceBalance').text('Rs 0.00');
+        $('#reservationInfo').hide();
+    });
+
+
+
+    // Handle view all reservations click
+    // $('#viewAllReservations').on('click', function(e) {
+    //     e.preventDefault();
+    //     const customerId = $('#customer').val();
+    //     if (customerId) {
+            
+    //         window.open(`/customer/${customerId}/reservations-detail`, '_blank');
+    //     }
+    // });
+
+  $(document).on('show.bs.modal', '#reserveProductModal', function() {
+      console.log('Reserve modal opening...');
+
+      // Clear any previous errors
+      $('.is-invalid').removeClass('is-invalid');
+      $('.invalid-feedback').remove();
+      $('#noProductsWarning').remove();
+
+      // Calculate and populate the total amount
+      const totalAmount = parseFloat($('#total').val()) || 0;
+      $('#reserveTotalAmount').val(totalAmount.toFixed(2));
+
+      // Set default delivery date (7 days from today)
+      const today = new Date();
+      const defaultDeliveryDate = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
+      const formattedDate = defaultDeliveryDate.toISOString().split('T')[0];
+      $('input[name="delivery_date"]').val(formattedDate);
+
+      // Check for reservable products
+      const reservableProducts = [];
+      $('#products tbody tr').each(function() {
+          const productId = $(this).find('input[name*="[product_id]"]').val();
+          const productName = $(this).find('input[name*="[name]"]').val() || $(this).find('td:eq(2)').text();
+          if (productId && productId !== '0') {
+              reservableProducts.push({
+                  id: productId,
+                  name: productName
+              });
+          }
+      });
+
+      console.log('Reservable products found:', reservableProducts);
+
+      if (reservableProducts.length === 0) {
+          $('#reserveProductModal .modal-body').prepend(
+              '<div class="alert alert-warning" id="noProductsWarning">' +
+              'No products available for reservation. Manual products cannot be reserved.' +
+              '</div>'
+          );
+          $('#reserveProductModal button[type="submit"]').prop('disabled', true);
+      } else {
+          $('#reserveProductModal button[type="submit"]').prop('disabled', false);
+      }
+  });
+
+  // UPDATED: Reserve Product Form Submit - Send proper product data
+  $('#reserveProductForm').off('submit').on('submit', function(e) {
+      e.preventDefault();
+
+      const customerId = $('#customer').val();
+      console.log('Customer ID:', customerId);
+
+      if (!customerId || $('#add_manual_customer').is(':checked')) {
+          toastr.error('Please select a customer from the dropdown first');
+          return;
+      }
+
+      const products = [];
+      let totalCalculated = 0;
+
+      $('#products tbody tr').each(function() {
+          const $row = $(this);
+          const productId = $row.find('input[name*="[product_id]"]').val();
+
+          if (productId && productId !== '0') {
+              const quantity = parseInt($row.find('input[name*="[qty]"]').val()) || 1;
+              const subTotal = parseFloat($row.find('input[name*="[sub_total]"]').val()) || 0;
+
+              // Calculate unit price from subtotal
+              const unitPrice = subTotal / quantity;
+
+              products.push({
+                  product_id: productId,
+                  quantity: quantity,
+                  unit_price: unitPrice, // Send unit_price as expected by validation
+                  line_total: subTotal
+              });
+
+              totalCalculated += subTotal;
+          }
+      });
+
+      console.log('Products to reserve:', products);
+
+      if (products.length === 0) {
+          toastr.error('Please add products to reserve (manual products cannot be reserved)');
+          return;
+      }
+
+      const formData = {
+          products: products,
+          total_amount: parseFloat($('#reserveTotalAmount').val()) || 0,
+          initial_payment: parseFloat($('input[name="initial_payment"]').val()) || 0,
+          delivery_date: $('input[name="delivery_date"]').val() || null
+      };
+
+      console.log('Form data being sent:', formData);
+
+      const submitBtn = $(this).find('button[type="submit"]');
+      const originalText = submitBtn.text();
+      submitBtn.prop('disabled', true).text('Creating Reservation...');
+
+      $.ajax({
+          url: `/customer/${customerId}/reservations`,
+          method: 'POST',
+          data: formData,
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function(response) {
+              console.log('Success response:', response);
+              if (response.success) {
+                  toastr.success(response.message || 'Products reserved successfully');
+                  $('#reserveProductModal').modal('hide');
+                  $('#reserveProductForm')[0].reset();
+
+                  const confirmClear = confirm('Products have been reserved successfully! Would you like to clear the current order form?');
+                  if (confirmClear) {
+                      $('#products tbody').empty();
+                      $('#product_no').val('');
+                      calculateTotal();
+                  }
+              } else {
+                  toastr.error(response.message || 'Failed to reserve products');
+              }
+          },
+          error: function(xhr) {
+              console.log('Error response:', xhr);
+              console.log('Status:', xhr.status);
+              console.log('Response text:', xhr.responseText);
+
+              let errorMessage = 'Failed to reserve products';
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                  errorMessage = xhr.responseJSON.message;
+              } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                  errorMessage = Object.values(xhr.responseJSON.errors).join('<br>');
+              }
+              toastr.error(errorMessage);
+          },
+          complete: function() {
+              submitBtn.prop('disabled', false).text(originalText);
+          }
+      });
+  });
+
+  // Additional utility functions that can be called from outside
+  window.ReservationFunctions = {
+      // Get reservable products with detailed information
+      getReservableProducts: function() {
+          const products = [];
+          $('#products tbody tr').each(function() {
+              const $row = $(this);
+              const productId = $row.find('input[name*="[product_id]"]').val();
+
+              // Only include actual products (not manual entries)
+              if (productId && productId !== '0') {
+                  const quantity = parseInt($row.find('input[name*="[qty]"]').val()) || 1;
+                  const unitPrice = parseFloat($row.find('input[name*="[price]"]').val()) || 0;
+                  const subTotal = parseFloat($row.find('input[name*="[sub_total]"]').val()) || 0;
+
+                  products.push({
+                      id: productId,
+                      name: $row.find('input[name*="[name]"]').val() || $row.find('td:eq(2)').text().trim(),
+                      quantity: quantity,
+                      unit_price: unitPrice,
+                      sub_total: subTotal > 0 ? subTotal : (quantity * unitPrice)
+                  });
+              }
+          });
+          return products;
+      },
+
+      // Validate reservation prerequisites
+      validateReservationPrerequisites: function() {
+          const customerId = $('#customer').val();
+          const isManualCustomer = $('#add_manual_customer').is(':checked');
+          const totalAmount = parseFloat($('#total').val()) || 0;
+          const reservableProducts = this.getReservableProducts();
+
+          const errors = [];
+
+          if (!customerId || isManualCustomer) {
+              errors.push('Please select a customer from the dropdown');
+          }
+
+          if (totalAmount <= 0) {
+              errors.push('Please add products to the order first');
+          }
+
+          if (reservableProducts.length === 0) {
+              errors.push('No products available for reservation');
+          }
+
+          return {
+              isValid: errors.length === 0,
+              errors: errors
+          };
+      },
+
+      // Clear reservation form
+      clearReservationForm: function() {
+          $('#reserveTotalAmount').val('');
+          $('input[name="initial_payment"]').val('');
+          $('input[name="delivery_date"]').val('');
+          $('#reserveProductForm .alert').remove();
+      },
+
+      // Get total amount for reservation
+      getReservationTotal: function() {
+          const products = this.getReservableProducts();
+          return products.reduce((total, product) => total + product.sub_total, 0);
+      }
+  };
+
+
+  // Clean up modals on hide
+  $(document).on('hidden.bs.modal', '#useAdvanceModal', function () {
+      $(this).remove();
+  });
+
+
+
+  /////////////// 15/07/2025 /////////////////////
+
+$('#cancelButton').on('click', function() {
+    // Clear customer selection
+   $('#customer').val('1').trigger('change');
+
+
+    // Clear manual customer checkbox and inputs
+    $('#add_manual_customer').prop('checked', false);
+    $('#manual_customer').hide().prop('required', false);
+    $('.customer_select_div').show();
+    $('#customer').prop('required', true);
+
+    // Clear product number input
+    $('#product_no').val('');
+
+    // Clear all product rows
+    $('#products tbody').empty();
+
+    // Reset totals
+    $('#total_amount').text('Rs 0.00');
+    $('#total').val('0.00');
+    $('#inclusive_tax').text('0.00');
+    $('#tax_rate').val('0.00');
+    $('#sub_total_amount').text('Rs 0.00');
+    $('#total_discount').val('0.00'); // Clear discount field
+
+    // Clear advance and balance
+    $('#advance').val('0.00');
+    $('#advanceUsed').val('0.00');
+    $('#balance_amount').text('Rs 0.00');
+    $('#balance').val('0.00');
+
+    // Clear and hide Used Advance Section - THIS WAS MISSING
+    $('#usedAdvanceSection').hide();
+    $('#used_advance_display').text('Rs 0.00');
+
+    // Clear customer advance balance display
+    $('#customerAdvanceBalance').text('Rs 0.00');
+
+    // Hide reservation info
+    $('#reservationInfo').hide();
+
+    // Re-enable advance button
+    $('#useAdvanceBtn').prop('disabled', false);
+
+    // Reset row counter
+    rowNo = 0;
+
+    // Show success message
+    toastr.success('Form cleared successfully');
+});
+</script>
+@endsection
